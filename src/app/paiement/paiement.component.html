@@ -1,0 +1,199 @@
+<!-- Header -->
+<header class="header">
+  <div class="header-container">
+    <div class="logo-section">
+      <div class="logo-icon">✓</div>
+      <div class="logo-text">
+        <h1 class="logo-title">Agréments Sénégal</h1>
+        <p class="logo-subtitle">République du Sénégal</p>
+      </div>
+    </div>
+    <nav class="nav-menu">
+      <a routerLink="/" class="nav-link">Accueil</a>
+      <a routerLink="/nouvelle-demande" class="nav-link">Nouvelle Demande</a>
+      <a routerLink="/suivre" class="nav-link">Suivre</a>
+    </nav>
+    <div class="header-actions">
+      <a routerLink="/connexion" class="btn-link">Connexion</a>
+      <a routerLink="/inscription" class="btn-secondary">S'inscrire</a>
+      <a routerLink="/nouvelle-demande" class="btn-primary">Nouvelle Demande</a>
+    </div>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main class="main-content">
+  <div class="container">
+    <!-- Page Title -->
+    <div class="page-title-section">
+      <h1 class="page-title">Paiement des Frais</h1>
+      <p class="page-subtitle">Finalisez votre demande en effectuant le paiement</p>
+    </div>
+
+    <div class="payment-layout">
+      <!-- Left Column - Payment Form -->
+      <div class="payment-form-section">
+        <!-- Payment Method Selection -->
+        <div class="payment-methods">
+          <h2 class="section-title">Méthode de Paiement</h2>
+          <div class="methods-grid">
+            <div 
+              class="method-card" 
+              *ngFor="let method of paymentMethods"
+              [class.selected]="selectedPaymentMethod === method.id"
+              (click)="selectPaymentMethod(method.id)"
+            >
+              <div class="method-radio">
+                <div class="radio-circle" [class.selected]="selectedPaymentMethod === method.id"></div>
+              </div>
+              <div class="method-icon">{{ method.icon }}</div>
+              <div class="method-content">
+                <h3 class="method-name">{{ method.name }}</h3>
+                <p class="method-description">{{ method.description }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Details Form (only for Carte Bancaire) -->
+        <div class="card-details-section" *ngIf="selectedPaymentMethod === 'carte'">
+          <h2 class="section-title">Détails de la Carte</h2>
+          <div class="form-group">
+            <label class="form-label">Numéro de Carte</label>
+            <input
+              type="text"
+              class="form-input"
+              placeholder="1234 5678 9012 3456"
+              [(ngModel)]="cardDetails.cardNumber"
+              (input)="formatCardNumber($event)"
+              maxlength="19"
+            />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Date d'Expiration</label>
+              <input
+                type="text"
+                class="form-input"
+                placeholder="MM/AA"
+                [(ngModel)]="cardDetails.expirationDate"
+                (input)="formatExpirationDate($event)"
+                maxlength="5"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">CVV</label>
+              <input
+                type="text"
+                class="form-input"
+                placeholder="123"
+                [(ngModel)]="cardDetails.cvv"
+                maxlength="3"
+              />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nom sur la Carte</label>
+            <input
+              type="text"
+              class="form-input"
+              placeholder="AMADOU DIALLO"
+              [(ngModel)]="cardDetails.cardName"
+            />
+          </div>
+
+          <!-- Security Info Box -->
+          <div class="security-box">
+            <div class="security-icon">🔒</div>
+            <div class="security-content">
+              <h4 class="security-title">Paiement Sécurisé</h4>
+              <p class="security-text">Vos informations de paiement sont protégées par un cryptage SSL</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile Money Form -->
+        <div class="mobile-money-section" *ngIf="selectedPaymentMethod === 'mobile'">
+          <h2 class="section-title">Détails Mobile Money</h2>
+          <div class="form-group">
+            <label class="form-label">Numéro de Téléphone</label>
+            <input
+              type="tel"
+              class="form-input"
+              placeholder="+221 77 123 4567"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Opérateur</label>
+            <select class="form-select">
+              <option value="">Sélectionnez un opérateur</option>
+              <option value="orange">Orange Money</option>
+              <option value="wave">Wave</option>
+              <option value="free">Free Money</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Bank Transfer Form -->
+        <div class="bank-transfer-section" *ngIf="selectedPaymentMethod === 'virement'">
+          <h2 class="section-title">Informations de Virement</h2>
+          <div class="info-box">
+            <p><strong>Banque:</strong> Banque Internationale pour le Commerce et l'Industrie du Sénégal (BICIS)</p>
+            <p><strong>RIB:</strong> SN08 0080 1010 1234567890123 45</p>
+            <p><strong>Bénéficiaire:</strong> Agréments Sénégal</p>
+            <p><strong>Montant:</strong> {{ total.toLocaleString() }} XOF</p>
+            <p><strong>Référence:</strong> {{ demandeId }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column - Summary Sidebar -->
+      <div class="summary-sidebar">
+        <div class="summary-card">
+          <h3 class="summary-title">Récapitulatif</h3>
+          <div class="summary-item">
+            <span class="summary-label">Demande #</span>
+            <span class="summary-value">{{ demandeId }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Type d'agrément</span>
+            <span class="summary-value">{{ demandeType }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Frais de dossier</span>
+            <span class="summary-value">{{ fraisDossier.toLocaleString() }} XOF</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Frais de traitement</span>
+            <span class="summary-value">{{ fraisTraitement.toLocaleString() }} XOF</span>
+          </div>
+          <div class="summary-total">
+            <span class="total-label">Total à Payer</span>
+            <span class="total-value">{{ total.toLocaleString() }} XOF</span>
+          </div>
+        </div>
+
+        <!-- Security Guarantee -->
+        <div class="guarantee-card">
+          <div class="guarantee-icon">✓</div>
+          <p class="guarantee-text">Nous protégeons vos données selon les normes internationales</p>
+        </div>
+
+        <!-- Immediate Confirmation -->
+        <div class="confirmation-card">
+          <div class="confirmation-icon">✓</div>
+          <p class="confirmation-text">Recevez votre reçu par email instantanément</p>
+        </div>
+
+        <!-- Payment Button -->
+        <button class="btn-pay" (click)="onSubmit()">
+          Payer {{ total.toLocaleString() }} XOF
+        </button>
+
+        <button class="btn-cancel" (click)="onCancel()">
+          Annuler
+        </button>
+      </div>
+    </div>
+  </div>
+</main>

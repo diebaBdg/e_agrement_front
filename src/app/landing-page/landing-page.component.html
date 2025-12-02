@@ -1,0 +1,149 @@
+<!-- Header -->
+<header class="header">
+  <div class="header-container">
+    <div class="logo-section">
+      <div class="logo-icon">✓</div>
+      <div class="logo-text">
+        <h1 class="logo-title">Agréments Sénégal</h1>
+        <p class="logo-subtitle">République du Sénégal</p>
+      </div>
+    </div>
+    <nav class="nav-menu">
+      <a routerLink="/" class="nav-link">Accueil</a>
+      <a routerLink="/nouvelle-demande" class="nav-link">Nouvelle Demande</a>
+      <a routerLink="/suivre" class="nav-link">Suivre</a>
+    </nav>
+    <div class="header-actions">
+      <a routerLink="/connexion" class="btn-link">Connexion</a>
+      <a routerLink="/inscription" class="btn-secondary">S'inscrire</a>
+      <a routerLink="/nouvelle-demande" class="btn-primary">Nouvelle Demande</a>
+    </div>
+  </div>
+</header>
+
+<!-- Hero Section -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="badge-official">
+      <span class="badge-icon">✓</span>
+      <span>Plateforme Officielle du Sénégal</span>
+    </div>
+    <h2 class="hero-title">
+      Gestion des Agréments <span class="highlight">Simplifiée</span>
+    </h2>
+    <p class="hero-description">
+      Soumettez et suivez vos demandes d'agrément en ligne pour les secteurs de la santé, éducation, hôtellerie et plus encore.
+    </p>
+    <div class="hero-actions">
+      <a routerLink="/nouvelle-demande" class="btn-hero-primary">
+        Nouvelle Demande
+        <span class="arrow">→</span>
+      </a>
+      <a routerLink="/suivre" class="btn-hero-secondary">Suivre ma Demande</a>
+    </div>
+  </div>
+</section>
+
+<!-- Types d'Agréments Section -->
+<section class="agrement-types">
+  <div class="container">
+    <h2 class="section-title">Types d'Agréments</h2>
+    <p class="section-subtitle">Nous couvrons tous les secteurs nécessitant une autorisation officielle</p>
+    <div class="types-grid">
+      <div class="type-card" *ngFor="let type of agrementTypes">
+        <div class="type-icon">{{ type.icon }}</div>
+        <h3 class="type-title">{{ type.title }}</h3>
+        <p class="type-subtitle">{{ type.subtitle }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Processus Simple Section -->
+<section class="process">
+  <div class="container">
+    <h2 class="section-title">Processus Simple</h2>
+    <p class="section-subtitle">Obtenez votre agrément en trois étapes faciles</p>
+    <div class="process-steps">
+      <div class="process-step" *ngFor="let step of processSteps">
+        <div class="step-number">{{ step.number }}</div>
+        <h3 class="step-title">{{ step.title }}</h3>
+        <p class="step-description">{{ step.description }}</p>
+        <div class="step-arrow" *ngIf="step.number < processSteps.length">→</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pourquoi Nous Choisir Section -->
+<section class="benefits">
+  <div class="container">
+    <h2 class="section-title">Pourquoi Nous Choisir</h2>
+    <p class="section-subtitle">Une plateforme moderne pour un service efficace</p>
+    <div class="benefits-grid">
+      <div class="benefit-item" *ngFor="let benefit of benefits">
+        <div class="benefit-icon">
+          <div class="checkmark">✓</div>
+        </div>
+        <h3 class="benefit-title">{{ benefit.title }}</h3>
+        <p class="benefit-description">{{ benefit.description }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Commencez Aujourd'hui Section -->
+<section class="cta-hero">
+  <div class="cta-content">
+    <h2 class="cta-title">Commencez Aujourd'hui</h2>
+    <p class="cta-description">
+      Simplifiez votre processus de demande d'agrément avec notre plateforme sécurisée, rapide et efficace.
+    </p>
+    <div class="cta-actions">
+      <a routerLink="/nouvelle-demande" class="btn-cta-primary">
+        Soumettre une Demande
+        <span class="arrow">→</span>
+      </a>
+      <a routerLink="/connexion" class="btn-cta-secondary">Connexion</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-column">
+      <div class="footer-logo">
+        <div class="logo-icon">✓</div>
+        <h3 class="footer-title">Agréments Sénégal</h3>
+      </div>
+      <p class="footer-description">
+        Plateforme officielle de gestion des agréments pour la République du Sénégal
+      </p>
+    </div>
+    <div class="footer-column">
+      <h3 class="footer-column-title">Services</h3>
+      <ul class="footer-links">
+        <li><a routerLink="/nouvelle-demande">Nouvelle Demande</a></li>
+        <li><a routerLink="/suivre">Suivre ma Demande</a></li>
+        <li><a routerLink="/dashboard">Tableau de Bord</a></li>
+      </ul>
+    </div>
+    <div class="footer-column">
+      <h3 class="footer-column-title">Informations</h3>
+      <ul class="footer-links">
+        <li><a routerLink="/a-propos">À Propos</a></li>
+        <li><a routerLink="/aide">Aide</a></li>
+        <li><a routerLink="/contact">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-column">
+      <h3 class="footer-column-title">Contact</h3>
+      <ul class="footer-contact">
+        <li>Email: contact&#64;agrement.sn</li>
+        <li>Tél: +221 33 123 4567</li>
+        <li>Dakar, Sénégal</li>
+      </ul>
+    </div>
+  </div>
+</footer>

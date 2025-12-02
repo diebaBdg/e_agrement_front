@@ -1,0 +1,265 @@
+<!-- Header -->
+<header class="header">
+  <div class="header-container">
+    <div class="logo-section">
+      <div class="logo-icon">✓</div>
+      <div class="logo-text">
+        <h1 class="logo-title">Agréments Sénégal</h1>
+        <p class="logo-subtitle">République du Sénégal</p>
+      </div>
+    </div>
+    <nav class="nav-menu">
+      <a routerLink="/" class="nav-link">Accueil</a>
+      <a routerLink="/nouvelle-demande" class="nav-link active">Nouvelle Demande</a>
+      <a routerLink="/suivre" class="nav-link">Suivre</a>
+    </nav>
+    <div class="header-actions">
+      <a routerLink="/connexion" class="btn-link">Connexion</a>
+      <a routerLink="/inscription" class="btn-secondary">S'inscrire</a>
+      <a routerLink="/nouvelle-demande" class="btn-primary">Nouvelle Demande</a>
+    </div>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main class="main-content">
+  <div class="container">
+    <!-- Page Title -->
+    <div class="page-title-section">
+      <h1 class="page-title">Nouvelle Demande d'Agrément</h1>
+      <p class="page-subtitle">
+        Veuillez remplir tous les champs requis et télécharger les documents nécessaires
+      </p>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="progress"></div>
+      </div>
+      <p class="progress-text">Étape {{ currentStep }} sur {{ totalSteps }}</p>
+    </div>
+
+    <!-- Stepper -->
+    <div class="stepper">
+      <div 
+        class="step-item" 
+        [class.active]="currentStep === 1"
+        [class.completed]="currentStep > 1"
+        (click)="goToStep(1)"
+      >
+        <div class="step-number">1</div>
+        <div class="step-label">Type d'Agrément</div>
+      </div>
+      <div class="step-connector" [class.completed]="currentStep > 1"></div>
+      <div 
+        class="step-item" 
+        [class.active]="currentStep === 2"
+        [class.completed]="currentStep > 2"
+        (click)="goToStep(2)"
+      >
+        <div class="step-number">2</div>
+        <div class="step-label">Informations du Demandeur</div>
+      </div>
+      <div class="step-connector" [class.completed]="currentStep > 2"></div>
+      <div 
+        class="step-item" 
+        [class.active]="currentStep === 3"
+        [class.completed]="currentStep > 3"
+        (click)="goToStep(3)"
+      >
+        <div class="step-number">3</div>
+        <div class="step-label">Informations de l'Établissement</div>
+      </div>
+      <div class="step-connector" [class.completed]="currentStep > 3"></div>
+      <div 
+        class="step-item" 
+        [class.active]="currentStep === 4"
+        [class.completed]="currentStep > 4"
+        (click)="goToStep(4)"
+      >
+        <div class="step-number">4</div>
+        <div class="step-label">Documents</div>
+      </div>
+    </div>
+
+    <!-- Form Card -->
+    <div class="form-card">
+      <!-- Step 1: Type d'Agrément -->
+      <div class="form-step" *ngIf="currentStep === 1">
+        <h2 class="section-title">Type d'Agrément</h2>
+        <div class="form-group">
+          <label class="form-label">
+            Type d'agrément demandé <span class="required">*</span>
+          </label>
+          <select 
+            class="form-select"
+            [(ngModel)]="formData.typeAgrement"
+            name="typeAgrement"
+            required
+          >
+            <option value="">Sélectionnez le type d'agrément</option>
+            <option *ngFor="let type of agrementTypes" [value]="type">{{ type }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Step 2: Informations du Demandeur -->
+      <div class="form-step" *ngIf="currentStep === 2">
+        <h2 class="section-title">Informations du Demandeur</h2>
+        <div class="form-group">
+          <label class="form-label">
+            Nom complet <span class="required">*</span>
+          </label>
+          <input 
+            type="text" 
+            class="form-input"
+            placeholder="Ex: Amadou Diallo"
+            [(ngModel)]="formData.nomComplet"
+            name="nomComplet"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">
+            Email <span class="required">*</span>
+          </label>
+          <input 
+            type="email" 
+            class="form-input"
+            placeholder="exemple@email.com"
+            [(ngModel)]="formData.email"
+            name="email"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">
+            Téléphone <span class="required">*</span>
+          </label>
+          <input 
+            type="tel" 
+            class="form-input"
+            placeholder="+221 77 123 4567"
+            [(ngModel)]="formData.telephone"
+            name="telephone"
+            required
+          />
+        </div>
+      </div>
+
+      <!-- Step 3: Informations de l'Établissement -->
+      <div class="form-step" *ngIf="currentStep === 3">
+        <h2 class="section-title">Informations de l'Établissement</h2>
+        <div class="form-group">
+          <label class="form-label">
+            Nom de l'établissement <span class="required">*</span>
+          </label>
+          <input 
+            type="text" 
+            class="form-input"
+            placeholder="Ex: Clinique Internationale de Dakar"
+            [(ngModel)]="formData.nomEtablissement"
+            name="nomEtablissement"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">
+            Adresse complète <span class="required">*</span>
+          </label>
+          <textarea 
+            class="form-textarea"
+            placeholder="Ex: Avenue Cheikh Anta Diop, Dakar, Sénégal"
+            [(ngModel)]="formData.adresse"
+            name="adresse"
+            rows="4"
+            required
+          ></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">
+            Description de l'activité <span class="required">*</span>
+          </label>
+          <textarea 
+            class="form-textarea"
+            placeholder="Décrivez l'activité et les services proposés..."
+            [(ngModel)]="formData.descriptionActivite"
+            name="descriptionActivite"
+            rows="6"
+            required
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Step 4: Documents Justificatifs -->
+      <div class="form-step" *ngIf="currentStep === 4">
+        <h2 class="section-title">Documents Justificatifs</h2>
+        <div 
+          class="upload-zone"
+          (dragover)="$event.preventDefault()"
+          (drop)="onFileDropped($event)"
+          (click)="fileInput.click()"
+        >
+          <input 
+            #fileInput
+            type="file" 
+            multiple
+            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+            (change)="onFileSelected($event)"
+            style="display: none;"
+          />
+          <div class="upload-icon">⬆️</div>
+          <p class="upload-text">Cliquez pour télécharger ou glissez-déposez</p>
+          <p class="upload-hint">PDF, Word, ou images (max. 10MB par fichier)</p>
+        </div>
+
+        <!-- Selected Files List -->
+        <div class="files-list" *ngIf="selectedFiles.length > 0">
+          <div class="file-item" *ngFor="let file of selectedFiles; let i = index">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span class="file-name">{{ file.name }}</span>
+              <span class="file-size">({{ (file.size / 1024 / 1024).toFixed(2) }} MB)</span>
+            </div>
+            <button class="file-remove" (click)="removeFile(i)">✗</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Buttons -->
+      <div class="form-actions">
+        <button 
+          class="btn-cancel" 
+          (click)="onCancel()"
+          *ngIf="currentStep === totalSteps"
+        >
+          Annuler
+        </button>
+        <button 
+          class="btn-previous" 
+          (click)="previousStep()"
+          *ngIf="currentStep > 1"
+        >
+          ← Précédent
+        </button>
+        <button 
+          class="btn-next" 
+          (click)="nextStep()"
+          *ngIf="currentStep < totalSteps"
+          [disabled]="!isStepValid(currentStep)"
+        >
+          Suivant →
+        </button>
+        <button 
+          class="btn-submit" 
+          (click)="onSubmit()"
+          *ngIf="currentStep === totalSteps"
+          [disabled]="!isStepValid(currentStep)"
+        >
+          Soumettre la Demande
+        </button>
+      </div>
+    </div>
+  </div>
+</main>

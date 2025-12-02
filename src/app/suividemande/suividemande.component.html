@@ -1,0 +1,156 @@
+<!-- Header -->
+<header class="header">
+  <div class="header-container">
+    <div class="logo-section">
+      <div class="logo-icon">✓</div>
+      <div class="logo-text">
+        <h1 class="logo-title">Agréments Sénégal</h1>
+        <p class="logo-subtitle">République du Sénégal</p>
+      </div>
+    </div>
+    <nav class="nav-menu">
+      <a routerLink="/" class="nav-link">Accueil</a>
+      <a routerLink="/nouvelle-demande" class="nav-link">Nouvelle Demande</a>
+      <a routerLink="/suivre" class="nav-link active">Suivre</a>
+    </nav>
+    <div class="header-actions">
+      <a routerLink="/connexion" class="btn-link">Connexion</a>
+      <a routerLink="/inscription" class="btn-secondary">S'inscrire</a>
+      <a routerLink="/nouvelle-demande" class="btn-primary">Nouvelle Demande</a>
+    </div>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main class="main-content">
+  <div class="container">
+    <!-- Page Title -->
+    <div class="page-title-section">
+      <h1 class="page-title">Suivi de Demande</h1>
+      <p class="page-subtitle">
+        Entrez votre numéro de suivi pour consulter l'état de votre demande d'agrément
+      </p>
+    </div>
+
+    <!-- Search Section -->
+    <div class="search-section">
+      <div class="search-container">
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Entrez votre numéro de suivi"
+          [(ngModel)]="trackingNumber"
+          (keyup.enter)="onSearch()"
+        />
+        <button class="search-btn" (click)="onSearch()">
+          <span class="search-icon">🔍</span>
+          Rechercher
+        </button>
+      </div>
+    </div>
+
+    <!-- Results Section - Affiché en bas de la recherche -->
+    <div class="results-section" *ngIf="showResults">
+      <!-- Application Details Card -->
+      <div class="details-card">
+        <div class="card-header">
+          <div class="card-icon">📄</div>
+          <div class="card-content">
+            <h2 class="card-title">{{ demandeData.nom }}</h2>
+            <p class="card-type">{{ demandeData.type }}</p>
+          </div>
+          <div class="card-status" [class]="'status-' + demandeData.statutColor">
+            <span class="status-icon">⏰</span>
+            <span>{{ demandeData.statut }}</span>
+          </div>
+        </div>
+        <div class="card-details">
+          <div class="detail-item">
+            <span class="detail-label">Numéro de Suivi</span>
+            <span class="detail-value">{{ demandeData.numeroSuivi }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Date de Soumission</span>
+            <span class="detail-value">{{ demandeData.dateSoumission }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timeline Card -->
+      <div class="timeline-card">
+        <h3 class="section-title">Progression du Traitement</h3>
+        <div class="timeline">
+          <div 
+            class="timeline-step" 
+            *ngFor="let step of timelineSteps"
+            [class.completed]="step.completed"
+            [class.pending]="!step.completed"
+          >
+            <div class="step-indicator">
+              <div class="step-circle" [class.completed]="step.completed">
+                <span class="step-icon">{{ step.icon }}</span>
+              </div>
+              <div class="step-line" *ngIf="step.id < timelineSteps.length"></div>
+            </div>
+            <div class="step-content">
+              <div class="step-header">
+                <h4 class="step-title">{{ step.title }}</h4>
+                <span class="step-date" *ngIf="step.completed">{{ step.date }} {{ step.time }}</span>
+              </div>
+              <p class="step-description">{{ step.description }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Documents Card -->
+      <div class="documents-card">
+        <h3 class="section-title">Documents Soumis</h3>
+        <div class="documents-list">
+          <div class="document-item" *ngFor="let doc of documents">
+            <div class="document-info">
+              <span class="document-icon">📄</span>
+              <div class="document-details">
+                <span class="document-name">{{ doc.name }}</span>
+                <span class="document-meta">{{ doc.size }} • Envoyé le {{ doc.uploadDate }}</span>
+              </div>
+            </div>
+            <button class="download-btn" (click)="downloadDocument(doc.id)">
+              <span class="download-icon">⬇️</span>
+              Télécharger
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Messages Card -->
+      <div class="messages-card">
+        <h3 class="section-title">
+          <span class="messages-icon">💬</span>
+          Messages
+        </h3>
+        <div class="messages-list">
+          <div class="message-item" *ngFor="let message of messages">
+            <div class="message-header">
+              <span class="message-sender">{{ message.sender }}</span>
+              <span class="message-time">{{ message.timestamp }}</span>
+            </div>
+            <p class="message-content">{{ message.content }}</p>
+          </div>
+        </div>
+        <div class="message-input-section">
+          <input
+            type="text"
+            class="message-input"
+            placeholder="Répondre ou poser une question..."
+            [(ngModel)]="replyMessage"
+            (keyup.enter)="sendMessage()"
+          />
+          <button class="send-btn" (click)="sendMessage()">
+            Envoyer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>

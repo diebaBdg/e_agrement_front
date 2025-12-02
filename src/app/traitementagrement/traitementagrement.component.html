@@ -1,0 +1,309 @@
+<!-- Header -->
+<header class="header">
+  <div class="header-container">
+    <div class="logo-section">
+      <div class="logo-icon">✓</div>
+      <div class="logo-text">
+        <h1 class="logo-title">Agréments Sénégal</h1>
+        <p class="logo-subtitle">République du Sénégal</p>
+      </div>
+    </div>
+    <nav class="nav-menu">
+      <a routerLink="/" class="nav-link">Accueil</a>
+      <a routerLink="/nouvelle-demande" class="nav-link">Nouvelle Demande</a>
+      <a routerLink="/suivre" class="nav-link">Suivre</a>
+    </nav>
+    <div class="header-actions">
+      <a routerLink="/connexion" class="btn-link">Connexion</a>
+      <a routerLink="/inscription" class="btn-secondary">S'inscrire</a>
+      <a routerLink="/nouvelle-demande" class="btn-primary">Nouvelle Demande</a>
+    </div>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main class="main-content">
+  <div class="container">
+    <!-- Title Section -->
+    <div class="title-section">
+      <h1 class="main-title">Tableau de Bord Instructeur</h1>
+      <p class="subtitle">Examinez et gérez les demandes d'agrément</p>
+    </div>
+
+    <!-- Status Cards -->
+    <div class="status-cards">
+      <div class="status-card" *ngFor="let card of statusCards" [class]="'card-' + card.color">
+        <div class="card-icon">{{ card.icon }}</div>
+        <div class="card-content">
+          <p class="card-label">{{ card.label }}</p>
+          <p class="card-value" [class]="'value-' + card.color">{{ card.value }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="search-filter-section">
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Rechercher par nom, organisation ou type..."
+          [(ngModel)]="searchQuery"
+        />
+      </div>
+      <button class="filter-btn">
+        <span class="filter-icon">⚙️</span>
+        Filtres
+      </button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button
+        class="tab"
+        [class.active]="activeTab === 'tous'"
+        (click)="onTabClick('tous')"
+      >
+        Tous
+      </button>
+      <button
+        class="tab"
+        [class.active]="activeTab === 'soumis'"
+        (click)="onTabClick('soumis')"
+      >
+        Soumis
+      </button>
+      <button
+        class="tab"
+        [class.active]="activeTab === 'en-examen'"
+        (click)="onTabClick('en-examen')"
+      >
+        En Examen
+      </button>
+      <button
+        class="tab"
+        [class.active]="activeTab === 'approuves'"
+        (click)="onTabClick('approuves')"
+      >
+        Approuvés
+      </button>
+      <button
+        class="tab"
+        [class.active]="activeTab === 'rejetes'"
+        (click)="onTabClick('rejetes')"
+      >
+        Rejetés
+      </button>
+    </div>
+
+    <!-- Requests List -->
+    <div class="requests-list">
+      <div class="request-card" *ngFor="let request of filteredRequests">
+        <div class="request-avatar" [style.background-color]="request.avatarColor">
+          {{ request.initials }}
+        </div>
+        <div class="request-content">
+          <div class="request-header">
+            <div class="request-info">
+              <h3 class="request-name">{{ request.name }}</h3>
+              <p class="request-organization">{{ request.organization }}</p>
+            </div>
+            <div class="request-status-badge" [class]="'badge-' + getStatusColor(request.status)">
+              <span class="badge-icon">
+                <span *ngIf="request.status === 'soumis'">ℹ️</span>
+                <span *ngIf="request.status === 'en-examen'">⏰</span>
+                <span *ngIf="request.status === 'approuves'">✓</span>
+                <span *ngIf="request.status === 'rejetes'">✗</span>
+              </span>
+              <span>{{ getStatusLabel(request.status) }}</span>
+            </div>
+          </div>
+          <div class="request-details">
+            <div class="detail-item">
+              <span class="detail-icon">📄</span>
+              <span>{{ request.type }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-icon">🕐</span>
+              <span>{{ request.date }}</span>
+            </div>
+          </div>
+          <p class="request-description">{{ request.description }}</p>
+          <button class="examiner-btn" (click)="onExaminer(request.id)">
+            Examiner
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Modal d'Examen de la Demande -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="modal-title-section">
+        <h2 class="modal-title">Détails de la Demande</h2>
+        <div class="modal-tags">
+          <span class="type-tag" *ngIf="selectedRequest">{{ selectedRequest.type }}</span>
+          <span class="status-tag" *ngIf="selectedRequest" [class]="'badge-' + getStatusColor(selectedRequest.status)">
+            {{ getStatusLabel(selectedRequest.status) }}
+          </span>
+        </div>
+      </div>
+      <button class="modal-close" (click)="closeModal()">✕</button>
+    </div>
+
+    <!-- Modal Tabs -->
+    <div class="modal-tabs" *ngIf="selectedRequest">
+      <button
+        class="modal-tab"
+        [class.active]="modalActiveTab === 'informations'"
+        (click)="onModalTabClick('informations')"
+      >
+        Informations
+      </button>
+      <button
+        class="modal-tab"
+        [class.active]="modalActiveTab === 'documents'"
+        (click)="onModalTabClick('documents')"
+      >
+        Documents
+      </button>
+      <button
+        class="modal-tab"
+        [class.active]="modalActiveTab === 'commentaires'"
+        (click)="onModalTabClick('commentaires')"
+      >
+        Commentaires
+      </button>
+    </div>
+
+    <!-- Modal Content -->
+    <div class="modal-content" *ngIf="selectedRequest">
+      <!-- Informations Tab -->
+      <div class="tab-panel" *ngIf="modalActiveTab === 'informations'">
+        <!-- Informations du Demandeur -->
+        <div class="info-section">
+          <h3 class="section-title">Informations du Demandeur</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-icon">👤</span>
+              <div class="info-content">
+                <span class="info-label">Nom Complet</span>
+                <span class="info-value">{{ selectedRequest.name }}</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <span class="info-icon">✉️</span>
+              <div class="info-content">
+                <span class="info-label">Email</span>
+                <span class="info-value">{{ selectedRequest.email || 'N/A' }}</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <span class="info-icon">📞</span>
+              <div class="info-content">
+                <span class="info-label">Téléphone</span>
+                <span class="info-value">{{ selectedRequest.telephone || 'N/A' }}</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <span class="info-icon">📅</span>
+              <div class="info-content">
+                <span class="info-label">Date de Soumission</span>
+                <span class="info-value">{{ selectedRequest.dateSoumission || selectedRequest.date }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Informations de l'Établissement -->
+        <div class="info-section">
+          <h3 class="section-title">Informations de l'Établissement</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-icon">🏢</span>
+              <div class="info-content">
+                <span class="info-label">Nom de l'Établissement</span>
+                <span class="info-value">{{ selectedRequest.organization }}</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <span class="info-icon">📍</span>
+              <div class="info-content">
+                <span class="info-label">Adresse</span>
+                <span class="info-value">{{ selectedRequest.adresse || 'N/A' }}</span>
+              </div>
+            </div>
+            <div class="info-item full-width">
+              <span class="info-icon">📄</span>
+              <div class="info-content">
+                <span class="info-label">Description</span>
+                <span class="info-value">{{ selectedRequest.description }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Documents Tab -->
+      <div class="tab-panel" *ngIf="modalActiveTab === 'documents'">
+        <div class="documents-section">
+          <h3 class="section-title">Documents Soumis</h3>
+          <div class="documents-list" *ngIf="requestDetails[selectedRequest.id]?.documents">
+            <div class="document-item" *ngFor="let doc of requestDetails[selectedRequest.id].documents">
+              <div class="document-info">
+                <span class="document-icon">📄</span>
+                <div class="document-details">
+                  <span class="document-name">{{ doc.name }}</span>
+                  <span class="document-meta">{{ doc.size }} • Envoyé le {{ doc.uploadDate }}</span>
+                </div>
+              </div>
+              <button class="download-btn" (click)="downloadDocument(doc.id)">
+                <span class="download-icon">⬇️</span>
+                Télécharger
+              </button>
+            </div>
+          </div>
+          <div class="no-documents" *ngIf="!requestDetails[selectedRequest.id]?.documents">
+            <p>Aucun document disponible</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Commentaires Tab -->
+      <div class="tab-panel" *ngIf="modalActiveTab === 'commentaires'">
+        <div class="comments-section">
+          <h3 class="section-title">Commentaires</h3>
+          <div class="comments-list" *ngIf="requestDetails[selectedRequest.id]?.comments">
+            <div class="comment-item" *ngFor="let comment of requestDetails[selectedRequest.id].comments">
+              <div class="comment-header">
+                <span class="comment-author">{{ comment.author }}</span>
+                <span class="comment-time">{{ comment.timestamp }}</span>
+              </div>
+              <p class="comment-content">{{ comment.content }}</p>
+            </div>
+          </div>
+          <div class="no-comments" *ngIf="!requestDetails[selectedRequest.id]?.comments">
+            <p>Aucun commentaire pour le moment</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Actions -->
+    <div class="modal-actions" *ngIf="selectedRequest">
+      <button class="btn-approve" (click)="onApprouver()">
+        <span class="action-icon">✓</span>
+        Approuver
+      </button>
+      <button class="btn-reject" (click)="onRejeter()">
+        <span class="action-icon">✗</span>
+        Rejeter
+      </button>
+    </div>
+  </div>
+</div>

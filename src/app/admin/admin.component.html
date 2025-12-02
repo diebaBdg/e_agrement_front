@@ -1,0 +1,314 @@
+<!-- Header -->
+<header class="header">
+  <div class="header-container">
+    <div class="logo-section">
+      <div class="logo-icon">✓</div>
+      <div class="logo-text">
+        <h1 class="logo-title">Agréments Sénégal</h1>
+        <p class="logo-subtitle">République du Sénégal</p>
+      </div>
+    </div>
+    <nav class="nav-menu">
+      <a routerLink="/" class="nav-link">Accueil</a>
+      <a routerLink="/nouvelle-demande" class="nav-link">Nouvelle Demande</a>
+      <a routerLink="/suivre" class="nav-link">Suivre</a>
+    </nav>
+    <div class="header-actions">
+      <a routerLink="/connexion" class="btn-link">Connexion</a>
+      <a routerLink="/inscription" class="btn-secondary">S'inscrire</a>
+      <a routerLink="/nouvelle-demande" class="btn-primary">Nouvelle Demande</a>
+    </div>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main class="main-content">
+  <div class="container">
+    <!-- Page Title Section -->
+    <div class="title-section">
+      <div>
+        <h1 class="page-title">Tableau de Bord Administrateur</h1>
+        <p class="page-subtitle">Vue d'ensemble et gestion du système</p>
+      </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="kpi-cards">
+      <div class="kpi-card" *ngFor="let kpi of kpiCards" [class]="'kpi-' + kpi.color">
+        <div class="kpi-content">
+          <div class="kpi-header">
+            <p class="kpi-label">{{ kpi.label }}</p>
+            <div class="kpi-icon">{{ kpi.icon }}</div>
+          </div>
+          <div class="kpi-value-section">
+            <h2 class="kpi-value">{{ kpi.value }}</h2>
+            <div class="kpi-subtitle" *ngIf="kpi.trend">
+              <span class="trend-icon">{{ kpi.trend }}</span>
+              <span>{{ kpi.subtitle }}</span>
+            </div>
+            <div class="kpi-subtitle" *ngIf="!kpi.trend">
+              <span>{{ kpi.subtitle }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button
+        class="tab"
+        [class.active]="activeTab === 'vue-ensemble'"
+        (click)="onTabClick('vue-ensemble')"
+      >
+        Vue d'ensemble
+      </button>
+      <button
+        class="tab"
+        [class.active]="activeTab === 'utilisateurs'"
+        (click)="onTabClick('utilisateurs')"
+      >
+        Utilisateurs
+      </button>
+      <button
+        class="tab"
+        [class.active]="activeTab === 'rapports'"
+        (click)="onTabClick('rapports')"
+      >
+        Rapports
+      </button>
+      <button
+        class="tab"
+        [class.active]="activeTab === 'parametres'"
+        (click)="onTabClick('parametres')"
+      >
+        Paramètres
+      </button>
+    </div>
+
+    <!-- Content based on active tab -->
+    <div class="tab-content" *ngIf="activeTab === 'vue-ensemble'">
+      <!-- Demandes par Type Section -->
+      <div class="demandes-type-card">
+        <div class="card-header">
+          <h3 class="card-title">
+            <span class="title-icon">📊</span>
+            Demandes par Type
+          </h3>
+        </div>
+        <div class="demandes-list">
+          <div class="demande-type-item" *ngFor="let demande of demandesParType">
+            <div class="type-info">
+              <span class="type-name">{{ demande.type }}</span>
+              <span class="type-count">{{ demande.count }} demandes</span>
+            </div>
+            <div class="bar-container">
+              <div 
+                class="type-bar" 
+                [style.width.%]="getBarWidth(demande.count)"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="charts-section">
+        <!-- Monthly Trends Card -->
+        <div class="trends-card">
+          <div class="card-header">
+            <h3 class="card-title">
+              <span class="title-icon">📈</span>
+              Tendances Mensuelles
+            </h3>
+          </div>
+          <div class="trends-content">
+            <div class="trend-item" *ngFor="let trend of monthlyTrends">
+              <div class="trend-header">
+                <span class="trend-month">{{ trend.month }}</span>
+                <span class="trend-total">{{ trend.total }}</span>
+              </div>
+              <div class="trend-bar">
+                <div 
+                  class="bar-segment soumis" 
+                  [style.width.%]="getSoumisPercentage(trend)"
+                  [title]="'Soumis: ' + trend.soumis"
+                ></div>
+                <div 
+                  class="bar-segment approuves" 
+                  [style.width.%]="getApprouvesPercentage(trend)"
+                  [title]="'Approuvés: ' + trend.approuves"
+                ></div>
+                <div 
+                  class="bar-segment rejetes" 
+                  [style.width.%]="getRejetesPercentage(trend)"
+                  [title]="'Rejetés: ' + trend.rejetes"
+                ></div>
+              </div>
+            </div>
+            <div class="legend">
+              <div class="legend-item">
+                <div class="legend-color soumis"></div>
+                <span>Soumis</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color approuves"></div>
+                <span>Approuvés</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color rejetes"></div>
+                <span>Rejetés</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity Card -->
+        <div class="activity-card">
+          <div class="card-header">
+            <h3 class="card-title">
+              <span class="title-icon">🕐</span>
+              Activité Récente
+            </h3>
+          </div>
+          <div class="activities-list">
+            <div class="activity-item" *ngFor="let activity of recentActivities">
+              <div class="activity-icon" [class]="'icon-' + activity.iconColor">
+                {{ activity.icon }}
+              </div>
+              <div class="activity-content">
+                <p class="activity-type">{{ activity.type }}</p>
+                <p class="activity-details">{{ activity.user }} • {{ activity.time }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Utilisateurs Tab -->
+    <div class="tab-content" *ngIf="activeTab === 'utilisateurs'">
+      <!-- Search and Filter Section -->
+      <div class="users-filters">
+        <div class="search-bar">
+          <span class="search-icon">🔍</span>
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Rechercher par nom, email ou téléphone..."
+            [(ngModel)]="searchQuery"
+          />
+        </div>
+        <div class="filters">
+          <select class="filter-select" [(ngModel)]="selectedRole">
+            <option value="tous">Tous les rôles</option>
+            <option value="Demandeur">Demandeur</option>
+            <option value="Instructeur">Instructeur</option>
+          </select>
+          <select class="filter-select" [(ngModel)]="selectedStatut">
+            <option value="tous">Tous les statuts</option>
+            <option value="actif">Actif</option>
+            <option value="inactif">Inactif</option>
+            <option value="suspendu">Suspendu</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Users List -->
+      <div class="users-card">
+        <div class="card-header">
+          <h3 class="card-title">
+            <span class="title-icon">👥</span>
+            Liste des Utilisateurs
+            <span class="users-count">({{ filteredUsers.length }})</span>
+          </h3>
+        </div>
+        <div class="users-table">
+          <div class="table-header">
+            <div class="table-col col-user">Utilisateur</div>
+            <div class="table-col col-email">Email</div>
+            <div class="table-col col-phone">Téléphone</div>
+            <div class="table-col col-role">Rôle</div>
+            <div class="table-col col-statut">Statut</div>
+            <div class="table-col col-demandes">Demandes</div>
+            <div class="table-col col-actions">Actions</div>
+          </div>
+          <div class="table-body">
+            <div class="table-row" *ngFor="let user of filteredUsers">
+              <div class="table-col col-user">
+                <div class="user-info">
+                  <div class="user-avatar" [style.background-color]="user.avatarColor">
+                    {{ getInitials(user.nom) }}
+                  </div>
+                  <div class="user-details">
+                    <span class="user-name">{{ user.nom }}</span>
+                    <span class="user-date">Inscrit le {{ user.dateInscription }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="table-col col-email">
+                <span class="email-text">{{ user.email }}</span>
+              </div>
+              <div class="table-col col-phone">
+                <span class="phone-text">{{ user.telephone }}</span>
+              </div>
+              <div class="table-col col-role">
+                <span class="role-badge" [class]="'role-' + getRoleColor(user.role)">
+                  {{ user.role }}
+                </span>
+              </div>
+              <div class="table-col col-statut">
+                <span class="statut-badge" [class]="'statut-' + getStatusColor(user.statut)">
+                  {{ getStatusLabel(user.statut) }}
+                </span>
+              </div>
+              <div class="table-col col-demandes">
+                <span class="demandes-count">{{ user.demandesTotal }}</span>
+              </div>
+              <div class="table-col col-actions">
+                <div class="action-buttons">
+                  <button class="action-btn edit-btn" (click)="onUserAction(user.id, 'edit')" title="Modifier">
+                    ✏️
+                  </button>
+                  <button class="action-btn view-btn" (click)="onUserAction(user.id, 'view')" title="Voir détails">
+                    👁️
+                  </button>
+                  <button 
+                    class="action-btn suspend-btn" 
+                    *ngIf="user.statut === 'actif'"
+                    (click)="onUserAction(user.id, 'suspend')" 
+                    title="Suspendre"
+                  >
+                    ⏸️
+                  </button>
+                  <button 
+                    class="action-btn activate-btn" 
+                    *ngIf="user.statut !== 'actif'"
+                    (click)="onUserAction(user.id, 'activate')" 
+                    title="Activer"
+                  >
+                    ▶️
+                  </button>
+                  <button class="action-btn delete-btn" (click)="onUserAction(user.id, 'delete')" title="Supprimer">
+                    🗑️
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="no-results" *ngIf="filteredUsers.length === 0">
+            <p>Aucun utilisateur trouvé</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Other tabs content (placeholder) -->
+    <div class="tab-content" *ngIf="activeTab !== 'vue-ensemble' && activeTab !== 'utilisateurs'">
+      <div class="placeholder-card">
+        <h3>Section {{ activeTab }}</h3>
+        <p>Contenu à venir...</p>
+      </div>
+    </div>
+  </div>
+</main>

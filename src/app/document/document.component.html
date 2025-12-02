@@ -1,0 +1,150 @@
+<!-- Header -->
+<header class="header">
+  <div class="header-container">
+    <div class="logo-section">
+      <div class="logo-icon">✓</div>
+      <div class="logo-text">
+        <h1 class="logo-title">Agréments Sénégal</h1>
+        <p class="logo-subtitle">République du Sénégal</p>
+      </div>
+    </div>
+    <nav class="nav-menu">
+      <a routerLink="/" class="nav-link">Accueil</a>
+      <a routerLink="/nouvelle-demande" class="nav-link">Nouvelle Demande</a>
+      <a routerLink="/suivre" class="nav-link">Suivre</a>
+    </nav>
+    <div class="header-actions">
+      <a routerLink="/connexion" class="btn-link">Connexion</a>
+      <a routerLink="/inscription" class="btn-secondary">S'inscrire</a>
+      <a routerLink="/nouvelle-demande" class="btn-primary">Nouvelle Demande</a>
+    </div>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main class="main-content" *ngIf="certificateData">
+  <div class="container">
+    <!-- Title and Actions -->
+    <div class="title-actions">
+      <h1 class="page-title">Certificat d'Agrément</h1>
+      <div class="action-buttons">
+        <button class="action-btn print-btn" (click)="onPrint()">
+          <span class="btn-icon">🖨️</span>
+          Imprimer
+        </button>
+        <button class="action-btn share-btn" (click)="onShare()">
+          <span class="btn-icon">🔗</span>
+          Partager
+        </button>
+        <button class="action-btn download-btn" (click)="onDownloadPDF()">
+          <span class="btn-icon">⬇️</span>
+          Télécharger PDF
+        </button>
+      </div>
+    </div>
+
+    <!-- Certificate -->
+    <div class="certificate-container">
+      <div class="certificate">
+        <!-- Certificate Header -->
+        <div class="certificate-header">
+          <div class="certificate-logo">
+            <div class="logo-shield">✓</div>
+          </div>
+          <div class="certificate-title-section">
+            <h2 class="republic-title">République du Sénégal</h2>
+            <p class="ministry-name">Ministère de la Santé et de l'Action Sociale</p>
+            <p class="motto">Un Peuple - Un But - Une Foi</p>
+          </div>
+        </div>
+
+        <div class="certificate-divider"></div>
+
+        <!-- Certificate Body -->
+        <div class="certificate-body">
+          <h3 class="certificate-title">CERTIFICAT D'AGRÉMENT</h3>
+          
+          <div class="certificate-number-badge">
+            Certificat N° {{ certificateData.numeroCertificat }}
+          </div>
+
+          <div class="certificate-content">
+            <p class="ministry-text">
+              Le Ministère de la Santé et de l'Action Sociale de la République du Sénégal
+            </p>
+            
+            <p class="certifies-text">CERTIFIE QUE</p>
+
+            <div class="beneficiary-info">
+              <p class="beneficiary-name">{{ certificateData.nomComplet }}</p>
+              <p class="establishment-info">
+                <span class="label">Établissement :</span>
+                <span class="value">{{ certificateData.etablissement }}</span>
+              </p>
+              <p class="address-info">
+                Situé à : {{ certificateData.adresse }}
+              </p>
+            </div>
+
+            <div class="approval-text">
+              <p>
+                a obtenu l'agrément pour l'exercice des activités dans le domaine de
+              </p>
+              <p class="domain-name">{{ certificateData.domaine }}</p>
+              <p>
+                conformément aux dispositions légales et réglementaires en vigueur.
+              </p>
+            </div>
+
+            <!-- Dates Section -->
+            <div class="dates-section">
+              <div class="date-box">
+                <span class="date-label">Date d'Approbation</span>
+                <span class="date-value">{{ certificateData.dateApprobation }}</span>
+              </div>
+              <div class="date-box">
+                <span class="date-label">Date d'Expiration</span>
+                <span class="date-value">{{ certificateData.dateExpiration }}</span>
+              </div>
+            </div>
+
+            <!-- Signature Section -->
+            <div class="signature-section">
+              <div class="signature-line"></div>
+              <p class="signature-label">Signature et Cachet</p>
+              <p class="director-name">{{ certificateData.directeur }}</p>
+              <p class="director-title">{{ certificateData.titreDirecteur }}</p>
+            </div>
+
+            <!-- Validity Text -->
+            <div class="validity-text">
+              <p>
+                Ce certificat est valable pour une durée de trois (3) ans à compter de la date d'approbation.
+              </p>
+              <p>
+                Vérifiable en ligne sur www.agrement.sn avec le numéro de certificat
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Verification Section -->
+      <div class="verification-section">
+        <div class="verification-box">
+          <div class="verification-icon">✓</div>
+          <div class="verification-content">
+            <h4 class="verification-title">Vérification du Certificat</h4>
+            <p class="verification-text">
+              Ce certificat peut être vérifié en ligne à tout moment en utilisant le numéro de certificat
+              <span class="certificate-number-highlight">{{ certificateData.numeroCertificat }}</span>
+            </p>
+            <button class="verify-btn" (click)="onVerify()">
+              Vérifier ce Certificat
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
