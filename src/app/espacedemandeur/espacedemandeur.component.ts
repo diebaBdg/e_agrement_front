@@ -98,6 +98,13 @@ errorMessage: any;
     });
   }
 
+  reloadMesDemandes(): void {
+    const user = this.authService.getUser();
+    if (user && user.id) {
+      this.loadMesDemandes(user.id);
+    }
+  }
+
   private mapDemande(demande: any): Demande {
     const statutInfo = this.getStatutInfo(demande.statut);
     
