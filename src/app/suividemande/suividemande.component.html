@@ -28,8 +28,13 @@
     <div class="page-title-section">
       <h1 class="page-title">Suivi de Demande</h1>
       <p class="page-subtitle">
-        Entrez votre numéro de suivi pour consulter l'état de votre demande d'agrément
+        Entrez votre numéro de suivi et votre email pour consulter l'état de votre demande d'agrément
       </p>
+    </div>
+
+    <!-- Message d'erreur -->
+    <div *ngIf="error" style="padding: 1rem; background: #fee2e2; border: 1px solid #ef4444; border-radius: 8px; margin-bottom: 1.5rem; color: #dc2626;">
+      {{ error }}
     </div>
 
     <!-- Search Section -->
@@ -38,13 +43,24 @@
         <input
           type="text"
           class="search-input"
-          placeholder="Entrez votre numéro de suivi"
+          placeholder="Entrez votre numéro de suivi (ex: SN-AGR-2024-001)"
           [(ngModel)]="trackingNumber"
-          (keyup.enter)="onSearch()"
+          (keyup.enter)="emailDemandeur ? onSearch() : null"
+          [disabled]="loading"
         />
-        <button class="search-btn" (click)="onSearch()">
-          <span class="search-icon">🔍</span>
-          Rechercher
+        <input
+          type="email"
+          class="search-input"
+          placeholder="Entrez votre email"
+          [(ngModel)]="emailDemandeur"
+          (keyup.enter)="trackingNumber ? onSearch() : null"
+          [disabled]="loading"
+          style="margin-top: 1rem;"
+        />
+        <button class="search-btn" (click)="onSearch()" [disabled]="loading">
+          <span class="search-icon" *ngIf="!loading">🔍</span>
+          <span *ngIf="!loading">Rechercher</span>
+          <span *ngIf="loading">Recherche...</span>
         </button>
       </div>
     </div>
@@ -95,7 +111,7 @@
             <div class="step-content">
               <div class="step-header">
                 <h4 class="step-title">{{ step.title }}</h4>
-                <span class="step-date" *ngIf="step.completed">{{ step.date }} {{ step.time }}</span>
+                <span class="step-date" *ngIf="step.completed && step.date">{{ step.date }} {{ step.time }}</span>
               </div>
               <p class="step-description">{{ step.description }}</p>
             </div>
@@ -104,7 +120,7 @@
       </div>
 
       <!-- Documents Card -->
-      <div class="documents-card">
+      <div class="documents-card" *ngIf="documents.length > 0">
         <h3 class="section-title">Documents Soumis</h3>
         <div class="documents-list">
           <div class="document-item" *ngFor="let doc of documents">
@@ -129,7 +145,7 @@
           <span class="messages-icon">💬</span>
           Messages
         </h3>
-        <div class="messages-list">
+        <div class="messages-list" *ngIf="messages.length > 0">
           <div class="message-item" *ngFor="let message of messages">
             <div class="message-header">
               <span class="message-sender">{{ message.sender }}</span>
@@ -137,6 +153,9 @@
             </div>
             <p class="message-content">{{ message.content }}</p>
           </div>
+        </div>
+        <div *ngIf="messages.length === 0" style="text-align: center; padding: 2rem; color: #6b7280;">
+          <p>Aucun message pour le moment</p>
         </div>
         <div class="message-input-section">
           <input

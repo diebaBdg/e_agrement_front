@@ -1,7 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { DemandeService } from '../core/services/demande.service';
+import { DocumentService } from '../core/services/document.service';
+import { AuthService } from '../core/services/auth.service';
 
 interface StatusCard {
   label: string;
@@ -46,162 +49,148 @@ interface Comment {
   templateUrl: './traitementagrement.component.html',
   styleUrl: './traitementagrement.component.css'
 })
-export class TraitementagrementComponent {
-  statusCards: StatusCard[] = [
-    {
-      label: 'Total',
-      value: 5,
-      icon: '📊',
-      color: 'gray'
-    },
-    {
-      label: 'Soumis',
-      value: 2,
-      icon: 'ℹ️',
-      color: 'blue'
-    },
-    {
-      label: 'En Examen',
-      value: 1,
-      icon: '⏰',
-      color: 'orange'
-    },
-    {
-      label: 'Approuvés',
-      value: 1,
-      icon: '✓',
-      color: 'green'
-    },
-    {
-      label: 'Rejetés',
-      value: 1,
-      icon: '✗',
-      color: 'red'
-    }
-  ];
+export class TraitementagrementComponent implements OnInit {
+  private demandeService = inject(DemandeService);
+  private documentService = inject(DocumentService);
+  private authService = inject(AuthService);
 
-  requests: ApprovalRequest[] = [
-    {
-      id: '1',
-      initials: 'DAN',
-      name: 'Dr. Awa Ndiaye',
-      organization: 'Cabinet Médical Ndiaye',
-      type: 'Médecine',
-      date: '15/01/2024',
-      description: 'Demande d\'agrément pour l\'ouverture d\'un cabinet médical spécialisé en pédiatrie',
-      status: 'soumis',
-      avatarColor: '#d1fae5'
-    },
-    {
-      id: '2',
-      initials: 'MB',
-      name: 'Moussa Ba',
-      organization: 'Pharmacie Ba',
-      type: 'Pharmacie',
-      date: '12/01/2024',
-      description: 'Demande d\'agrément pour l\'ouverture d\'une pharmacie',
-      status: 'en-examen',
-      avatarColor: '#fef3c7'
-    },
-    {
-      id: '3',
-      initials: 'AS',
-      name: 'Amadou Sow',
-      organization: 'Laboratoire Sow',
-      type: 'Laboratoires',
-      date: '10/01/2024',
-      description: 'Demande d\'agrément pour un laboratoire d\'analyses médicales',
-      status: 'approuves',
-      avatarColor: '#d1fae5'
-    },
-    {
-      id: '4',
-      initials: 'MK',
-      name: 'Mariama Kane',
-      organization: 'École Privée Kane',
-      type: 'Établissements Scolaires',
-      date: '08/01/2024',
-      description: 'Demande d\'agrément pour une école privée',
-      status: 'rejetes',
-      avatarColor: '#fee2e2'
-    },
-    {
-      id: '5',
-      initials: 'ID',
-      name: 'Ibrahima Diallo',
-      organization: 'Hôtel Diallo',
-      type: 'Hôtellerie',
-      date: '05/01/2024',
-      description: 'Demande d\'agrément pour un hôtel',
-      status: 'soumis',
-      avatarColor: '#dbeafe'
-    }
-  ];
-
+  statusCards: StatusCard[] = [];
+  requests: ApprovalRequest[] = [];
   activeTab: string = 'tous';
   searchQuery: string = '';
   showModal: boolean = false;
   selectedRequest: ApprovalRequest | null = null;
   modalActiveTab: string = 'informations';
+  loading: boolean = true;
+  error: string | null = null;
 
-  // Données détaillées pour la modal
-  requestDetails: any = {
-    '1': {
-      email: 'awa.ndiaye@example.com',
-      telephone: '+221 77 456 7890',
-      adresse: 'Avenue Cheikh Anta Diop, Dakar, Sénégal',
-      dateSoumission: '15 janvier 2024',
-      documents: [
-        { id: '1', name: 'Licence Professionnelle.pdf', size: '2.4 MB', uploadDate: '15/01/2024' },
-        { id: '2', name: 'Certificat d\'Enregistrement.pdf', size: '1.8 MB', uploadDate: '15/01/2024' }
-      ],
-      comments: [
-        { id: '1', author: 'Instructeur - Aminata Diop', content: 'Dossier complet, en attente de vérification des documents.', timestamp: '2024-01-16 10:30' }
-      ]
-    },
-    '2': {
-      email: 'moussa.ba@example.com',
-      telephone: '+221 77 123 4567',
-      adresse: 'Rue de la Pharmacie, Dakar, Sénégal',
-      dateSoumission: '12 janvier 2024',
-      documents: [
-        { id: '3', name: 'Autorisation d\'Ouverture.pdf', size: '1.5 MB', uploadDate: '12/01/2024' }
-      ],
-      comments: [
-        { id: '2', author: 'Instructeur - Aminata Diop', content: 'Examen en cours.', timestamp: '2024-01-16 09:00' }
-      ]
-    },
-    '3': {
-      email: 'amadou.sow@example.com',
-      telephone: '+221 77 234 5678',
-      adresse: 'Boulevard Général de Gaulle, Dakar, Sénégal',
-      dateSoumission: '10 janvier 2024',
-      documents: [
-        { id: '4', name: 'Agrément Laboratoire.pdf', size: '3.2 MB', uploadDate: '10/01/2024' }
-      ],
-      comments: []
-    },
-    '4': {
-      email: 'mariama.kane@example.com',
-      telephone: '+221 77 345 6789',
-      adresse: 'Avenue Faidherbe, Dakar, Sénégal',
-      dateSoumission: '08 janvier 2024',
-      documents: [],
-      comments: [
-        { id: '3', author: 'Instructeur - Aminata Diop', content: 'Documents manquants.', timestamp: '2024-01-10 14:00' }
-      ]
-    },
-    '5': {
-      email: 'ibrahima.diallo@example.com',
-      telephone: '+221 77 456 7890',
-      adresse: 'Corniche Ouest, Dakar, Sénégal',
-      dateSoumission: '05 janvier 2024',
-      documents: [
-        { id: '5', name: 'Permis d\'Exploitation.pdf', size: '2.1 MB', uploadDate: '05/01/2024' }
-      ],
-      comments: []
+  requestDetails: any = {};
+  instructeurId: string = '';
+
+  ngOnInit(): void {
+    const user = this.authService.getUser();
+    if (!user || !user.id) {
+      alert('Veuillez vous connecter');
+      return;
     }
-  };
+
+    // Vérifier le rôle
+    if (!this.authService.hasRole('INSTRUCTEUR')) {
+      alert('Accès réservé aux instructeurs');
+      return;
+    }
+
+    this.instructeurId = user.id;
+    this.loadDemandesInstructeur();
+    this.loadStatistiques();
+  }
+
+  loadDemandesInstructeur(): void {
+    this.loading = true;
+    this.error = null;
+
+    this.demandeService.getDemandesInstructeur(this.instructeurId).subscribe({
+      next: (demandes) => {
+        this.requests = demandes.map(d => this.mapDemande(d));
+        this.updateStatusCards();
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Erreur chargement demandes:', err);
+        this.error = 'Impossible de charger les demandes';
+        this.loading = false;
+      }
+    });
+  }
+
+  loadStatistiques(): void {
+    this.demandeService.getStatistiquesInstructeur(this.instructeurId).subscribe({
+      next: (stats) => {
+        this.statusCards = [
+          {
+            label: 'Total',
+            value: stats.totalDemandes,
+            icon: '📊',
+            color: 'gray'
+          },
+          {
+            label: 'Soumis',
+            value: stats.demandesSoumises,
+            icon: 'ℹ️',
+            color: 'blue'
+          },
+          {
+            label: 'En Examen',
+            value: stats.demandesEnCours,
+            icon: '⏰',
+            color: 'orange'
+          },
+          {
+            label: 'Approuvés',
+            value: stats.demandesApprouvees,
+            icon: '✓',
+            color: 'green'
+          },
+          {
+            label: 'Rejetés',
+            value: stats.demandesRejetees,
+            icon: '✗',
+            color: 'red'
+          }
+        ];
+      },
+      error: (err) => {
+        console.error('Erreur chargement statistiques:', err);
+      }
+    });
+  }
+
+  private mapDemande(demande: any): ApprovalRequest {
+    const initials = this.getInitials(demande.nomCompletDemandeur);
+    
+    return {
+      id: demande.id,
+      initials: initials,
+      name: demande.nomCompletDemandeur,
+      organization: demande.nomEtablissement,
+      type: demande.typeAgrement?.libelle || 'N/A',
+      date: this.formatDate(demande.createdAt),
+      description: demande.descriptionActivite,
+      status: this.mapStatut(demande.statut),
+      avatarColor: this.generateAvatarColor(demande.nomCompletDemandeur),
+      email: demande.emailDemandeur,
+      telephone: demande.telephoneDemandeur,
+      adresse: demande.adresseEtablissement,
+      dateSoumission: this.formatDate(demande.createdAt)
+    };
+  }
+
+  private mapStatut(statut: string): 'soumis' | 'en-examen' | 'approuves' | 'rejetes' {
+    const statutMap: any = {
+      'SOUMIS': 'soumis',
+      'EN_COURS': 'en-examen',
+      'EN_EXAMEN': 'en-examen',
+      'APPROUVE': 'approuves',
+      'REJETE': 'rejetes'
+    };
+    return statutMap[statut] || 'soumis';
+  }
+
+  private updateStatusCards(): void {
+    const total = this.requests.length;
+    const soumis = this.requests.filter(r => r.status === 'soumis').length;
+    const enExamen = this.requests.filter(r => r.status === 'en-examen').length;
+    const approuves = this.requests.filter(r => r.status === 'approuves').length;
+    const rejetes = this.requests.filter(r => r.status === 'rejetes').length;
+
+    this.statusCards = [
+      { label: 'Total', value: total, icon: '📊', color: 'gray' },
+      { label: 'Soumis', value: soumis, icon: 'ℹ️', color: 'blue' },
+      { label: 'En Examen', value: enExamen, icon: '⏰', color: 'orange' },
+      { label: 'Approuvés', value: approuves, icon: '✓', color: 'green' },
+      { label: 'Rejetés', value: rejetes, icon: '✗', color: 'red' }
+    ];
+  }
 
   get filteredRequests(): ApprovalRequest[] {
     let filtered = this.requests;
@@ -222,12 +211,123 @@ export class TraitementagrementComponent {
     return filtered;
   }
 
+  onTabClick(tab: string): void {
+    this.activeTab = tab;
+  }
+
+  onExaminer(requestId: string): void {
+    const request = this.requests.find(r => r.id === requestId);
+    if (!request) return;
+
+    this.selectedRequest = request;
+    this.modalActiveTab = 'informations';
+    
+    // Charger les documents
+    this.loadDocuments(requestId);
+    
+    this.showModal = true;
+  }
+
+  private loadDocuments(demandeId: string): void {
+    this.documentService.getDocumentsByDemande(demandeId).subscribe({
+      next: (docs) => {
+        this.requestDetails[demandeId] = {
+          documents: docs.map(d => ({
+            id: d.id,
+            name: d.nomFichier,
+            size: d.tailleFormatee,
+            uploadDate: this.formatDate(d.dateUpload)
+          })),
+          comments: []
+        };
+      },
+      error: (err) => {
+        console.error('Erreur chargement documents:', err);
+      }
+    });
+  }
+
+  closeModal(): void {
+    this.showModal = false;
+    this.selectedRequest = null;
+  }
+
+  onModalTabClick(tab: string): void {
+    this.modalActiveTab = tab;
+  }
+
+  onApprouver(): void {
+    if (!this.selectedRequest) return;
+
+    const commentaire = prompt('Commentaire (optionnel):') || '';
+    
+    this.demandeService.approuverDemande(
+      this.selectedRequest.id,
+      this.instructeurId,
+      { commentaire }
+    ).subscribe({
+      next: () => {
+        alert('Demande approuvée avec succès !');
+        this.closeModal();
+        this.loadDemandesInstructeur();
+        this.loadStatistiques();
+      },
+      error: (err) => {
+        console.error('Erreur approbation:', err);
+        alert('Erreur lors de l\'approbation');
+      }
+    });
+  }
+
+  onRejeter(): void {
+    if (!this.selectedRequest) return;
+
+    const motifRejet = prompt('Veuillez indiquer la raison du rejet:');
+    if (!motifRejet) return;
+
+    const commentaire = prompt('Commentaire additionnel (optionnel):') || '';
+
+    this.demandeService.rejeterDemande(
+      this.selectedRequest.id,
+      this.instructeurId,
+      { motifRejet, commentaire }
+    ).subscribe({
+      next: () => {
+        alert('Demande rejetée.');
+        this.closeModal();
+        this.loadDemandesInstructeur();
+        this.loadStatistiques();
+      },
+      error: (err) => {
+        console.error('Erreur rejet:', err);
+        alert('Erreur lors du rejet');
+      }
+    });
+  }
+
+  downloadDocument(docId: string): void {
+    this.documentService.downloadDocument(docId).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'document';
+        link.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        console.error('Erreur téléchargement:', err);
+        alert('Erreur lors du téléchargement');
+      }
+    });
+  }
+
   getStatusLabel(status: string): string {
     const labels: { [key: string]: string } = {
       'soumis': 'Soumis',
       'en-examen': 'En Examen',
-      'approuves': 'Approuvés',
-      'rejetes': 'Rejetés'
+      'approuves': 'Approuvé',
+      'rejetes': 'Rejeté'
     };
     return labels[status] || status;
   }
@@ -242,55 +342,27 @@ export class TraitementagrementComponent {
     return colors[status] || 'gray';
   }
 
-  onTabClick(tab: string): void {
-    this.activeTab = tab;
+  private getInitials(name: string): string {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 3);
   }
 
-  onExaminer(requestId: string): void {
-    this.selectedRequest = this.requests.find(r => r.id === requestId) || null;
-    if (this.selectedRequest) {
-      // Enrichir avec les détails
-      const details = this.requestDetails[requestId];
-      if (details) {
-        this.selectedRequest = { ...this.selectedRequest, ...details };
-      }
-      this.showModal = true;
-      this.modalActiveTab = 'informations';
-    }
+  private generateAvatarColor(name: string): string {
+    const colors = ['#d1fae5', '#fef3c7', '#fee2e2', '#dbeafe', '#e0e7ff'];
+    const index = name.length % colors.length;
+    return colors[index];
   }
 
-  closeModal(): void {
-    this.showModal = false;
-    this.selectedRequest = null;
-  }
-
-  onModalTabClick(tab: string): void {
-    this.modalActiveTab = tab;
-  }
-
-  onApprouver(): void {
-    if (this.selectedRequest) {
-      console.log('Approuver la demande:', this.selectedRequest.id);
-      // Logique d'approbation
-      alert('Demande approuvée avec succès !');
-      this.closeModal();
-    }
-  }
-
-  onRejeter(): void {
-    if (this.selectedRequest) {
-      const reason = prompt('Veuillez indiquer la raison du rejet :');
-      if (reason) {
-        console.log('Rejeter la demande:', this.selectedRequest.id, 'Raison:', reason);
-        // Logique de rejet
-        alert('Demande rejetée.');
-        this.closeModal();
-      }
-    }
-  }
-
-  downloadDocument(docId: string): void {
-    console.log('Télécharger le document:', docId);
-    alert('Téléchargement du document en cours...');
+  private formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
   }
 }
