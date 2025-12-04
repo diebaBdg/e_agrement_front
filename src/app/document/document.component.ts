@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
+import { SharedHeaderComponent } from "../shared/shared-header/shared-header.component";
 
 interface CertificateData {
   numeroCertificat: string;
@@ -16,7 +17,7 @@ interface CertificateData {
 
 @Component({
   selector: 'app-document',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, SharedHeaderComponent],
   templateUrl: './document.component.html',
   styleUrl: './document.component.css'
 })

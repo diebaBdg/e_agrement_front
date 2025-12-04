@@ -9,6 +9,7 @@ import { AdminComponent } from './admin/admin.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { DocumentComponent } from './document/document.component';
+import { SharedHeaderComponent } from './shared/shared-header/shared-header.component';
 
 export const routes: Routes = [
   {

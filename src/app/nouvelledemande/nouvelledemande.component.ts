@@ -6,10 +6,11 @@ import { DemandeService } from '../core/services/demande.service';
 import { TypeAgrementService } from '../core/services/type-agrement.service';
 import { DocumentService } from '../core/services/document.service';
 import { AuthService } from '../core/services/auth.service';
+import { SharedHeaderComponent } from "../shared/shared-header/shared-header.component";
 
 @Component({
   selector: 'app-nouvelledemande',
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, SharedHeaderComponent],
   templateUrl: './nouvelledemande.component.html',
   styleUrl: './nouvelledemande.component.css'
 })
@@ -25,6 +26,7 @@ export class NouvelledemandeComponent implements OnInit {
   loading: boolean = false;
   loadingTypes: boolean = false;
   errorMessage: string = '';
+  isAuthenticated: boolean = false;
 
   agrementTypes: any[] = [];
 
@@ -45,7 +47,27 @@ export class NouvelledemandeComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadTypesAgrement();
-    this.loadUserData();
+    this.checkAuthentication();
+  }
+
+  checkAuthentication(): void {
+    const user = this.authService.getUser();
+    this.isAuthenticated = !!user;
+    
+    if (this.isAuthenticated && user) {
+      // Pré-remplir les informations du demandeur si connecté
+      this.formData.nomCompletDemandeur = user.fullName || '';
+      this.formData.emailDemandeur = user.email || '';
+      // Récupérer le téléphone depuis l'API si nécessaire
+      if (user.id) {
+        this.loadUserPhone(user.id);
+      }
+    }
+  }
+
+  loadUserPhone(userId: string): void {
+    // Vous pouvez charger les détails complets de l'utilisateur ici
+    // Pour l'instant, on utilise ce qui est dans le token
   }
 
   loadTypesAgrement(): void {
@@ -53,6 +75,7 @@ export class NouvelledemandeComponent implements OnInit {
     this.typeAgrementService.getTypesAgrement().subscribe({
       next: (types) => {
         this.agrementTypes = types.filter(t => t.actif);
+        console.log('Types chargés:', this.agrementTypes);
         this.loadingTypes = false;
       },
       error: (err) => {
@@ -61,14 +84,6 @@ export class NouvelledemandeComponent implements OnInit {
         this.loadingTypes = false;
       }
     });
-  }
-
-  loadUserData(): void {
-    const user = this.authService.getUser();
-    if (user) {
-      this.formData.nomCompletDemandeur = user.fullName || '';
-      this.formData.emailDemandeur = user.email || '';
-    }
   }
 
   get progress(): number {
@@ -105,6 +120,12 @@ export class NouvelledemandeComponent implements OnInit {
         this.errorMessage = '';
       }
     }
+  }
+
+  // Méthode pour obtenir le libellé du type d'agrément
+  getTypeAgrementLibelle(typeId: string): string {
+    const type = this.agrementTypes.find(t => t.id === typeId);
+    return type ? type.libelle : '';
   }
 
   onFileSelected(event: any): void {
@@ -291,10 +312,5 @@ export class NouvelledemandeComponent implements OnInit {
   private isValidEmail(email: string): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
-  }
-
-  getTypeAgrementLibelle(id: string): string {
-    const type = this.agrementTypes.find(t => t.id === id);
-    return type ? type.libelle : '';
   }
 }

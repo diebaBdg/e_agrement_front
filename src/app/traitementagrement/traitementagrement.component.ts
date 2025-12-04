@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { DemandeService } from '../core/services/demande.service';
 import { DocumentService } from '../core/services/document.service';
 import { AuthService } from '../core/services/auth.service';
+import { SharedHeaderComponent } from "../shared/shared-header/shared-header.component";
 
 interface StatusCard {
   label: string;
@@ -45,7 +46,7 @@ interface Comment {
 
 @Component({
   selector: 'app-traitementagrement',
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, SharedHeaderComponent],
   templateUrl: './traitementagrement.component.html',
   styleUrl: './traitementagrement.component.css'
 })

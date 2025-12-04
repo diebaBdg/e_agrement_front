@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { DemandeService } from '../core/services/demande.service';
 import { DocumentService } from '../core/services/document.service';
 import { AuthService } from '../core/services/auth.service';
+import { SharedHeaderComponent } from "../shared/shared-header/shared-header.component";
 
 interface SummaryCard {
   label: string;
@@ -44,7 +45,7 @@ interface DemandeDetails {
 
 @Component({
   selector: 'app-espacedemandeur',
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, SharedHeaderComponent],
   templateUrl: './espacedemandeur.component.html',
   styleUrl: './espacedemandeur.component.css'
 })

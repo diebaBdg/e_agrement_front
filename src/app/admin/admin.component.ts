@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { DemandeService } from '../core/services/demande.service';
 import { UserService } from '../core/services/user.service';
 import { AuthService } from '../core/services/auth.service';
+import { SharedHeaderComponent } from "../shared/shared-header/shared-header.component";
 
 interface KPICard {
   label: string;
@@ -27,25 +28,27 @@ interface User {
   avatarColor: string;
 }
 
+interface TypeDemandeStats {
+  type: string;
+  count: number;
+  pourcentage: number;
+}
+
+interface MonthlyTrend {
+  month: string;
+  total: number;
+  soumis: number;
+  approuves: number;
+  rejetes: number;
+}
+
 @Component({
   selector: 'app-admin',
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, SharedHeaderComponent],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.css'
 })
 export class AdminComponent implements OnInit {
-getBarWidth(arg0: any) {
-throw new Error('Method not implemented.');
-}
-getSoumisPercentage(_t78: any) {
-throw new Error('Method not implemented.');
-}
-getApprouvesPercentage(_t78: any) {
-throw new Error('Method not implemented.');
-}
-getRejetesPercentage(_t78: any) {
-throw new Error('Method not implemented.');
-}
   private demandeService = inject(DemandeService);
   private userService = inject(UserService);
   private authService = inject(AuthService);
@@ -59,9 +62,10 @@ throw new Error('Method not implemented.');
   
   loading: boolean = true;
   error: string | null = null;
-demandesParType: any;
-monthlyTrends: any;
-recentActivities: any;
+  
+  demandesParType: TypeDemandeStats[] = [];
+  monthlyTrends: MonthlyTrend[] = [];
+  recentActivities: any[] = [];
 
   ngOnInit(): void {
     this.loadDashboardData();
@@ -74,22 +78,18 @@ recentActivities: any;
     // Charger les statistiques globales
     this.demandeService.getStatistiquesGlobales().subscribe({
       next: (stats) => {
+        const tauxApprobation = stats.totalDemandes > 0 
+          ? Math.round((stats.demandesApprouvees / stats.totalDemandes) * 100) 
+          : 0;
+
         this.kpiCards = [
           {
             label: 'Total Demandes',
             value: stats.totalDemandes,
             subtitle: 'Toutes les demandes',
             trend: '↑',
-            icon: '📄',
-            color: 'green'
-          },
-          {
-            label: 'Utilisateurs',
-            value: 0, // Sera mis à jour après le chargement des utilisateurs
-            subtitle: 'Utilisateurs actifs',
-            trend: '↑',
-            icon: '👥',
-            color: 'green'
+            icon: '📊',
+            color: 'gray'
           },
           {
             label: 'En Cours',
@@ -100,16 +100,29 @@ recentActivities: any;
             color: 'orange'
           },
           {
+            label: 'Approuvées',
+            value: stats.demandesApprouvees,
+            subtitle: 'Demandes validées',
+            trend: '↑',
+            icon: '✓',
+            color: 'green'
+          },
+          {
             label: 'Taux d\'Approbation',
-            value: stats.totalDemandes > 0 
-              ? Math.round((stats.demandesApprouvees / stats.totalDemandes) * 100) 
-              : 0,
+            value: tauxApprobation,
             subtitle: 'Des demandes',
             trend: '↑',
-            icon: '📊',
+            icon: '📈',
             color: 'green'
           }
         ];
+
+        // Générer les statistiques par type (simulé)
+        this.generateTypeStats(stats);
+        
+        // Générer les tendances mensuelles (simulé)
+        this.generateMonthlyTrends(stats);
+
         this.loading = false;
       },
       error: (err) => {
@@ -142,13 +155,90 @@ recentActivities: any;
         const userKpi = this.kpiCards.find(k => k.label === 'Utilisateurs');
         if (userKpi) {
           userKpi.value = this.users.filter(u => u.statut === 'actif').length;
+        } else {
+          this.kpiCards.push({
+            label: 'Utilisateurs',
+            value: this.users.filter(u => u.statut === 'actif').length,
+            subtitle: 'Utilisateurs actifs',
+            trend: '↑',
+            icon: '👥',
+            color: 'blue'
+          });
         }
       },
       error: (err) => {
         console.error('Erreur lors du chargement des utilisateurs:', err);
-        this.error = 'Impossible de charger les utilisateurs';
       }
     });
+  }
+
+  generateTypeStats(stats: any): void {
+    const total = stats.totalDemandes || 1;
+    
+    // Simulation des types (à remplacer par des vraies données de l'API)
+    this.demandesParType = [
+      {
+        type: 'Médecine',
+        count: Math.round(stats.totalDemandes * 0.3),
+        pourcentage: 30
+      },
+      {
+        type: 'Pharmacie',
+        count: Math.round(stats.totalDemandes * 0.25),
+        pourcentage: 25
+      },
+      {
+        type: 'Laboratoires',
+        count: Math.round(stats.totalDemandes * 0.2),
+        pourcentage: 20
+      },
+      {
+        type: 'Établissements Scolaires',
+        count: Math.round(stats.totalDemandes * 0.15),
+        pourcentage: 15
+      },
+      {
+        type: 'Hôtellerie',
+        count: Math.round(stats.totalDemandes * 0.1),
+        pourcentage: 10
+      }
+    ];
+  }
+
+  generateMonthlyTrends(stats: any): void {
+    const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin'];
+    
+    this.monthlyTrends = months.map(month => {
+      const total = Math.floor(Math.random() * 50) + 20;
+      const soumis = Math.floor(total * 0.4);
+      const approuves = Math.floor(total * 0.35);
+      const rejetes = total - soumis - approuves;
+      
+      return {
+        month,
+        total,
+        soumis,
+        approuves,
+        rejetes
+      };
+    });
+  }
+
+  getBarWidth(count: number): number {
+    const max = Math.max(...this.demandesParType.map(d => d.count));
+    return max > 0 ? (count / max) * 100 : 0;
+  }
+
+  getSoumisPercentage(trend: MonthlyTrend): number {
+    return trend.total > 0 ? (trend.soumis / trend.total) * 100 : 0;
+  }
+
+  getApprouvesPercentage(trend: MonthlyTrend): number {
+    return trend.total > 0 ? (trend.approuves / trend.total) * 100 : 0;
+  }
+
+  getRejetesPercentage(trend: MonthlyTrend): number {
+    return trend.total > 0 ? (trend.rejetes / trend.total) * 100 : 0;
   }
 
   get filteredUsers(): User[] {
@@ -182,11 +272,11 @@ recentActivities: any;
     switch(action) {
       case 'edit':
         console.log('Modifier utilisateur:', userId);
-        // TODO: Implémenter la modification
+        alert('Fonctionnalité de modification en cours de développement');
         break;
       case 'view':
         console.log('Voir utilisateur:', userId);
-        // TODO: Implémenter la vue détails
+        alert('Fonctionnalité de visualisation en cours de développement');
         break;
       case 'suspend':
         this.suspendUser(userId);

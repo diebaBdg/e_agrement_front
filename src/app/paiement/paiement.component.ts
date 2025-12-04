@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { SharedHeaderComponent } from "../shared/shared-header/shared-header.component";
 
 interface PaymentMethod {
   id: string;
@@ -13,7 +14,7 @@ interface PaymentMethod {
 
 @Component({
   selector: 'app-paiement',
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, SharedHeaderComponent],
   templateUrl: './paiement.component.html',
   styleUrl: './paiement.component.css'
 })

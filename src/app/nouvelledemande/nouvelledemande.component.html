@@ -1,5 +1,5 @@
 <!-- Header -->
-<header class="header">
+<app-shared-header>
   <div class="header-container">
     <div class="logo-section">
       <div class="logo-icon">✓</div>
@@ -19,7 +19,7 @@
       <a routerLink="/nouvelle-demande" class="btn-primary">Nouvelle Demande</a>
     </div>
   </div>
-</header>
+</app-shared-header>
 
 <!-- Main Content -->
 <main class="main-content">
@@ -88,25 +88,46 @@
       <!-- Step 1: Type d'Agrément -->
       <div class="form-step" *ngIf="currentStep === 1">
         <h2 class="section-title">Type d'Agrément</h2>
-        <div class="form-group">
+        
+        <div *ngIf="loadingTypes" style="text-align: center; padding: 2rem;">
+          <p>Chargement des types d'agrément...</p>
+        </div>
+
+        <div class="form-group" *ngIf="!loadingTypes">
           <label class="form-label">
             Type d'agrément demandé <span class="required">*</span>
           </label>
           <select 
             class="form-select"
-            [(ngModel)]="formData.typeAgrement"
+            [(ngModel)]="formData.typeAgrementId"
             name="typeAgrement"
             required
           >
             <option value="">Sélectionnez le type d'agrément</option>
-            <option *ngFor="let type of agrementTypes" [value]="type">{{ type }}</option>
+            <option *ngFor="let type of agrementTypes" [value]="type.id">
+              {{ type.libelle }}
+            </option>
           </select>
+          
+          <!-- Afficher la description du type sélectionné -->
+          <div *ngIf="formData.typeAgrementId" style="margin-top: 1rem; padding: 1rem; background: #f0fdfa; border-radius: 8px;">
+            <p style="margin: 0; color: #0d9488; font-weight: 500;">
+              {{ getTypeAgrementLibelle(formData.typeAgrementId) }}
+            </p>
+          </div>
         </div>
       </div>
 
       <!-- Step 2: Informations du Demandeur -->
       <div class="form-step" *ngIf="currentStep === 2">
         <h2 class="section-title">Informations du Demandeur</h2>
+        
+        <div *ngIf="isAuthenticated" style="padding: 1rem; background: #dbeafe; border-radius: 8px; margin-bottom: 1.5rem;">
+          <p style="margin: 0; color: #1e40af; font-weight: 500;">
+            ℹ️ Vos informations ont été pré-remplies automatiquement
+          </p>
+        </div>
+        
         <div class="form-group">
           <label class="form-label">
             Nom complet <span class="required">*</span>
@@ -115,8 +136,9 @@
             type="text" 
             class="form-input"
             placeholder="Ex: Amadou Diallo"
-            [(ngModel)]="formData.nomComplet"
+            [(ngModel)]="formData.nomCompletDemandeur"
             name="nomComplet"
+            [readonly]="isAuthenticated"
             required
           />
         </div>
@@ -128,8 +150,9 @@
             type="email" 
             class="form-input"
             placeholder="exemple@email.com"
-            [(ngModel)]="formData.email"
+            [(ngModel)]="formData.emailDemandeur"
             name="email"
+            [readonly]="isAuthenticated"
             required
           />
         </div>
@@ -141,7 +164,7 @@
             type="tel" 
             class="form-input"
             placeholder="+221 77 123 4567"
-            [(ngModel)]="formData.telephone"
+            [(ngModel)]="formData.telephoneDemandeur"
             name="telephone"
             required
           />
@@ -171,7 +194,7 @@
           <textarea 
             class="form-textarea"
             placeholder="Ex: Avenue Cheikh Anta Diop, Dakar, Sénégal"
-            [(ngModel)]="formData.adresse"
+            [(ngModel)]="formData.adresseEtablissement"
             name="adresse"
             rows="4"
             required
@@ -227,6 +250,11 @@
         </div>
       </div>
 
+      <!-- Message d'erreur -->
+      <div *ngIf="errorMessage" style="padding: 1rem; background: #fee2e2; border: 1px solid #ef4444; border-radius: 8px; margin-top: 1.5rem; color: #dc2626;">
+        {{ errorMessage }}
+      </div>
+
       <!-- Navigation Buttons -->
       <div class="form-actions">
         <button 
@@ -255,9 +283,10 @@
           class="btn-submit" 
           (click)="onSubmit()"
           *ngIf="currentStep === totalSteps"
-          [disabled]="!isStepValid(currentStep)"
+          [disabled]="!isStepValid(currentStep) || loading"
         >
-          Soumettre la Demande
+          <span *ngIf="!loading">Soumettre la Demande</span>
+          <span *ngIf="loading">Soumission en cours...</span>
         </button>
       </div>
     </div>

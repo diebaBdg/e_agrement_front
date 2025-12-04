@@ -4,6 +4,7 @@ import { RouterModule, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DemandeService } from '../core/services/demande.service';
 import { DocumentService } from '../core/services/document.service';
+import { SharedHeaderComponent } from "../shared/shared-header/shared-header.component";
 
 interface TimelineStep {
   id: number;
@@ -31,7 +32,7 @@ interface Message {
 
 @Component({
   selector: 'app-suividemande',
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, SharedHeaderComponent],
   templateUrl: './suividemande.component.html',
   styleUrl: './suividemande.component.css'
 })

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { SharedHeaderComponent } from "../shared/shared-header/shared-header.component";
 
 interface AgrementType {
   icon: string;
@@ -21,7 +22,7 @@ interface Benefit {
 
 @Component({
   selector: 'app-landing-page',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, SharedHeaderComponent],
   templateUrl: './landing-page.component.html',
   styleUrl: './landing-page.component.css'
 })

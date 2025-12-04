@@ -1,5 +1,4 @@
-<!-- Header -->
-<header class="header">
+<app-shared-header>
   <div class="header-container">
     <div class="logo-section">
       <div class="logo-icon">✓</div>
@@ -19,7 +18,7 @@
       <a routerLink="/nouvelle-demande" class="btn-primary">Nouvelle Demande</a>
     </div>
   </div>
-</header>
+</app-shared-header>
 
 <!-- Main Content -->
 <main class="main-content">
@@ -303,12 +302,92 @@
       </div>
     </div>
 
-    <!-- Other tabs content (placeholder) -->
+    <div class="tab-content" *ngIf="activeTab === 'rapports'">
+      <div class="reports-section">
+        <h2 class="section-title">Rapports et Analyses</h2>
+        
+        <!-- Période de rapport -->
+        <div class="report-filters">
+          <div class="filter-group">
+            <label>Période</label>
+            <select class="filter-select">
+              <option>Ce mois</option>
+              <option>Ce trimestre</option>
+              <option>Cette année</option>
+              <option>Personnalisée</option>
+            </select>
+          </div>
+          
+          <button class="btn-generate-report">
+            Générer le Rapport
+          </button>
+        </div>
+        
+        <!-- Métriques clés -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <h4>Taux de Traitement</h4>
+            <p class="metric-value">85%</p>
+            <p class="metric-subtitle">Demandes traitées dans les délais</p>
+          </div>
+          
+          <div class="metric-card">
+            <h4>Délai Moyen</h4>
+            <p class="metric-value">12 jours</p>
+            <p class="metric-subtitle">Temps moyen de traitement</p>
+          </div>
+          
+          <div class="metric-card">
+            <h4>Satisfaction</h4>
+            <p class="metric-value">4.5/5</p>
+            <p class="metric-subtitle">Note moyenne des demandeurs</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" *ngIf="activeTab === 'parametres'">
+      <div class="settings-section">
+        <h2 class="section-title">Paramètres Système</h2>
+        
+        <!-- Types d'agrément -->
+        <div class="settings-group">
+          <h3>Types d'Agrément</h3>
+          <button class="btn-add">
+            Ajouter un Type
+          </button>
+          <!-- Liste des types -->
+        </div>
+        
+        <!-- Délais de traitement -->
+        <div class="settings-group">
+          <h3>Délais de Traitement</h3>
+          <div class="form-group">
+            <label>Délai standard (jours)</label>
+            <input type="number" value="30" class="form-input" />
+          </div>
+        </div>
+        
+        <!-- Notifications -->
+        <div class="settings-group">
+          <h3>Notifications</h3>
+          <label class="checkbox-label">
+            <input type="checkbox" checked />
+            <span>Envoyer des emails aux demandeurs</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" checked />
+            <span>Notifier les instructeurs des nouvelles demandes</span>
+          </label>
+        </div>
+      </div>
+    </div>
+    <!-- Other tabs content (placeholder)
     <div class="tab-content" *ngIf="activeTab !== 'vue-ensemble' && activeTab !== 'utilisateurs'">
       <div class="placeholder-card">
         <h3>Section {{ activeTab }}</h3>
         <p>Contenu à venir...</p>
       </div>
-    </div>
+    </div> -->
   </div>
 </main>

@@ -3,10 +3,11 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../core/services/auth.service';
+import { SharedHeaderComponent } from "../shared/shared-header/shared-header.component";
 
 @Component({
   selector: 'app-login',
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, SharedHeaderComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
@@ -82,7 +83,7 @@ export class LoginComponent {
     if (roles.includes('ADMIN') || roles.includes('ADMINISTRATEUR')) {
       this.router.navigate(['/admin']);
     } else if (roles.includes('INSTRUCTEUR')) {
-      this.router.navigate(['/traitement-agrement']);
+      this.router.navigate(['/tableau-de-bord']);
     } else {
       this.router.navigate(['/mon-espace']);
     }

@@ -1,0 +1,57 @@
+<header class="header">
+  <div class="header-container">
+    <div class="logo-section" routerLink="/" style="cursor: pointer;">
+      <div class="logo-icon">✓</div>
+      <div class="logo-text">
+        <h1 class="logo-title">Agréments Sénégal</h1>
+        <p class="logo-subtitle">République du Sénégal</p>
+      </div>
+    </div>
+    
+    <nav class="nav-menu">
+      <a routerLink="/" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Accueil</a>
+      
+      <!-- Liens publics (visible uniquement si non connecté) -->
+      <ng-container *ngIf="!isAuthenticated">
+        <a routerLink="/nouvelle-demande" class="nav-link" routerLinkActive="active">Nouvelle Demande</a>
+        <a routerLink="/suivre" class="nav-link" routerLinkActive="active">Suivre</a>
+      </ng-container>
+      
+      <!-- Liens pour Demandeur -->
+      <ng-container *ngIf="isAuthenticated && userRole === 'DEMANDEUR'">
+        <a routerLink="/mon-espace" class="nav-link" routerLinkActive="active">Mon Espace</a>
+        <a routerLink="/nouvelle-demande" class="nav-link" routerLinkActive="active">Nouvelle Demande</a>
+      </ng-container>
+      
+      <!-- Liens pour Instructeur -->
+      <ng-container *ngIf="isAuthenticated && userRole === 'INSTRUCTEUR'">
+        <a routerLink="/tableau-de-bord" class="nav-link" routerLinkActive="active">Mes Demandes</a>
+      </ng-container>
+      
+      <!-- Liens pour Admin -->
+      <ng-container *ngIf="isAuthenticated && userRole === 'ADMIN'">
+        <a routerLink="/admin" class="nav-link" routerLinkActive="active">Administration</a>
+      </ng-container>
+    </nav>
+    
+    <div class="header-actions">
+      <!-- Actions si non connecté -->
+      <ng-container *ngIf="!isAuthenticated">
+        <a routerLink="/connexion" class="btn-link">Connexion</a>
+        <a routerLink="/inscription" class="btn-secondary">S'inscrire</a>
+        <a routerLink="/nouvelle-demande" class="btn-primary">Nouvelle Demande</a>
+      </ng-container>
+      
+      <!-- Actions si connecté -->
+      <ng-container *ngIf="isAuthenticated">
+        <div class="user-info">
+          <span class="user-name">{{ userName }}</span>
+          <span class="user-role">{{ userRoleLabel }}</span>
+        </div>
+        <button class="btn-logout" (click)="onLogout()">
+          Déconnexion
+        </button>
+      </ng-container>
+    </div>
+  </div>
+</header>
