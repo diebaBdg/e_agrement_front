@@ -6,6 +6,7 @@ import { DemandeService } from '../core/services/demande.service';
 import { TypeAgrementService } from '../core/services/type-agrement.service';
 import { DocumentService } from '../core/services/document.service';
 import { AuthService } from '../core/services/auth.service';
+import { UserService } from '../core/services/user.service'; // AJOUTER CET IMPORT
 import { SharedHeaderComponent } from "../shared/shared-header/shared-header.component";
 
 @Component({
@@ -19,12 +20,14 @@ export class NouvelledemandeComponent implements OnInit {
   private typeAgrementService = inject(TypeAgrementService);
   private documentService = inject(DocumentService);
   private authService = inject(AuthService);
+  private userService = inject(UserService); // AJOUTER CE SERVICE
   private router = inject(Router);
 
   currentStep: number = 1;
   totalSteps: number = 4;
   loading: boolean = false;
   loadingTypes: boolean = false;
+  loadingUser: boolean = false;
   errorMessage: string = '';
   isAuthenticated: boolean = false;
 
@@ -55,19 +58,33 @@ export class NouvelledemandeComponent implements OnInit {
     this.isAuthenticated = !!user;
     
     if (this.isAuthenticated && user) {
-      // Pré-remplir les informations du demandeur si connecté
-      this.formData.nomCompletDemandeur = user.fullName || '';
+      // Pré-remplir les informations de base du demandeur
+      this.formData.nomCompletDemandeur = user.fullName || user.username || '';
       this.formData.emailDemandeur = user.email || '';
-      // Récupérer le téléphone depuis l'API si nécessaire
+      
+      // Récupérer les détails complets de l'utilisateur pour le téléphone
       if (user.id) {
-        this.loadUserPhone(user.id);
+        this.loadUserDetails(user.id);
       }
     }
   }
 
-  loadUserPhone(userId: string): void {
-    // Vous pouvez charger les détails complets de l'utilisateur ici
-    // Pour l'instant, on utilise ce qui est dans le token
+  loadUserDetails(userId: string): void {
+    this.loadingUser = true;
+    this.userService.getUserById(userId).subscribe({
+      next: (userDetails) => {
+        // Utiliser les données complètes de l'utilisateur
+        this.formData.nomCompletDemandeur = userDetails.fullName || userDetails.username || '';
+        this.formData.emailDemandeur = userDetails.email || '';
+        this.formData.telephoneDemandeur = userDetails.phone || userDetails.phone || '';
+        this.loadingUser = false;
+      },
+      error: (err) => {
+        console.error('Erreur lors du chargement des détails utilisateur:', err);
+        // Continuer avec les données de base du token
+        this.loadingUser = false;
+      }
+    });
   }
 
   loadTypesAgrement(): void {

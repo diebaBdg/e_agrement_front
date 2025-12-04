@@ -159,6 +159,9 @@
         <div class="form-group">
           <label class="form-label">
             Téléphone <span class="required">*</span>
+            <span *ngIf="loadingUser && isAuthenticated" style="font-size: 0.875rem; color: #6b7280;">
+              (Chargement...)
+            </span>
           </label>
           <input 
             type="tel" 
@@ -166,8 +169,12 @@
             placeholder="+221 77 123 4567"
             [(ngModel)]="formData.telephoneDemandeur"
             name="telephone"
+            [readonly]="isAuthenticated"
             required
           />
+          <div *ngIf="isAuthenticated && !loadingUser && !formData.telephoneDemandeur" style="margin-top: 0.5rem; font-size: 0.875rem; color: #ef4444;">
+            <p>⚠️ Aucun téléphone trouvé dans votre profil. Veuillez le renseigner.</p>
+          </div>
         </div>
       </div>
 
