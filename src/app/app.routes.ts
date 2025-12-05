@@ -11,7 +11,7 @@ import { RegisterComponent } from './register/register.component';
 import { DocumentComponent } from './document/document.component';
 import { SharedHeaderComponent } from './shared/shared-header/shared-header.component';
 
-export const routes: Routes = [
+export const routes: Routes = [ 
   {
     path: '',
     component: LandingPageComponent
